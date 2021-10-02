@@ -3,8 +3,6 @@ import cv2
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 
-cap = cv2.VideoCapture(0)
-
 def find_histogram(clt):
     """
     create a histogram with k clusters
@@ -18,7 +16,6 @@ def find_histogram(clt):
     hist /= hist.sum()
 
     return hist
-
 def plot_colors2(hist, centroids):
     bar = np.zeros((50, 300, 3), dtype="uint8")
     startX = 0
@@ -33,9 +30,10 @@ def plot_colors2(hist, centroids):
     # return the bar chart
     return bar
 
+cap = cv2.VideoCapture(0)
+
 while True:
     _, frame = cap.read()
-
     lower_blue = np.array([100,0,0])  
     upper_blue = np.array([255,100,100])
      # Threshold the HSV image to get only blue colors
@@ -48,16 +46,15 @@ while True:
         blue_area = max(bluecnts, key=cv2.contourArea)
         (xg,yg,wg,hg) = cv2.boundingRect(blue_area)
         cv2.rectangle(frame,(xg,yg),(xg+wg, yg+hg),(0,255,0),2)
-        box_img = frame[yg:yg+hg,xg:xg+wg]
+        box_image = frame[yg:yg+hg,xg:xg+wg]
 
         cv2.imshow('frame',frame)
 
-        #selects a random box as the image and reshapes it like 
-        box_img=cv2.cvtColor(box_img,cv2.COLOR_BGR2RGB)
-        box_img = box_img.reshape((box_img.shape[0] * box_img.shape[1],3))
+        box_image=cv2.cvtColor(box_image,cv2.COLOR_BGR2RGB)
+        box_image = box_image.reshape((box_image.shape[0] * box_image.shape[1],3))
 
         clt = KMeans(n_clusters=3) #cluster number
-        clt.fit(box_img)
+        clt.fit(box_image)
 
         hist = find_histogram(clt)
         bar = plot_colors2(hist, clt.cluster_centers_)
